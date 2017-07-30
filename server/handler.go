@@ -11,7 +11,7 @@ func (s *Server) genericHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.WithFields(logrus.Fields{
 		"host": r.Host,
 		"uri":  r.RequestURI,
-	}).Debug("new domain request")
+	}).Debug("request")
 
 	// TODO: check and / or configure backend container
 	time.Sleep(time.Millisecond * 1000)

@@ -4,4 +4,10 @@ package config
 type Config struct {
 	ListenAddr string
 	SocketPath string
+	Runtime    *Runtime
+}
+
+type Runtime struct {
+	Name   string
+	Config interface{}
 }
