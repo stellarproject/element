@@ -1,11 +1,17 @@
 package docker
 
 import (
+	"errors"
+
 	"github.com/docker/docker/client"
 )
 
 const (
-	elementRuntimeLabel = "runtime.element"
+	elementRuntimeLabel = "element.runtime"
+)
+
+var (
+	ErrContainerNotFound = errors.New("container not found")
 )
 
 type Docker struct {

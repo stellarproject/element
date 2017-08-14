@@ -1,5 +1,6 @@
 package docker
 
-func (d *Docker) Delete(id string) error {
+func (d *Docker) Delete(namespace, id string) error {
+	// TODO
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	ID        string
 	Frontends map[string]*Frontend `json:"frontends,omitempty"`
 }
 

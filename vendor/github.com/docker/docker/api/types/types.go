@@ -168,7 +168,6 @@ type Info struct {
 	RegistryConfig     *registry.ServiceConfig
 	NCPU               int
 	MemTotal           int64
-	GenericResources   []swarm.GenericResource
 	DockerRootDir      string
 	HTTPProxy          string `json:"HttpProxy"`
 	HTTPSProxy         string `json:"HttpsProxy"`

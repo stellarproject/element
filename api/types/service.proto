@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package element.v1.types;
+
+import "gogoproto/gogo.proto";
+
+message Service {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  repeated string hosts = 2;
+  RuntimeSpec runtime_spec = 3;
+}
+
+message RuntimeSpec {
+  string namespace = 1;
+  string image = 2;
+  string protocol = 3;
+  string runtime = 4;
+  uint64 port = 5;
+  map<string, string> labels = 6;
+}

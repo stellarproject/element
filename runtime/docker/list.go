@@ -10,7 +10,7 @@ import (
 
 func (d *Docker) List(namespace string) ([]runtime.Container, error) {
 	optFilters := filters.NewArgs()
-	//optFilters.Add("label", elementRuntimeLabel)
+	optFilters.Add("label", elementRuntimeLabel)
 
 	dockerContainers, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{
 		Filters: optFilters,
@@ -21,8 +21,10 @@ func (d *Docker) List(namespace string) ([]runtime.Container, error) {
 
 	var containers []runtime.Container
 	for _, c := range dockerContainers {
+		endpoint := getContainerEndpoint(c)
 		containers = append(containers, Container{
-			id: c.ID,
+			id:       c.ID,
+			endpoint: endpoint,
 		})
 	}
 

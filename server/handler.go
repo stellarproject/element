@@ -1,8 +1,8 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -13,14 +13,12 @@ func (s *Server) genericHandler(w http.ResponseWriter, r *http.Request) {
 		"uri":  r.RequestURI,
 	}).Debug("request")
 
-	// TODO: check and / or configure backend container
-	time.Sleep(time.Millisecond * 1000)
-
-	// TODO: update proxy config with new backend
-	time.Sleep(time.Millisecond * 1000)
+	if err := s.connect(r.Host); err != nil {
+		http.Error(w, fmt.Sprintf("error connecting to backend: %s", err), http.StatusInternalServerError)
+		return
+	}
 
 	// TODO: issue redirect to host to have client re-send and connect to backend
-
 	w.Header().Set("Location", r.RequestURI)
 	w.WriteHeader(http.StatusFound)
 }

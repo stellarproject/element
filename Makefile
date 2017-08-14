@@ -14,6 +14,11 @@ build: build-static
 generate:
 	@echo ${PACKAGES} | xargs protobuild
 
+docker-generate:
+	@echo "** This uses a separate Dockerfile (Dockerfile.build) **"
+	@docker build -t element-dev -f Dockerfile.build .
+	@docker run -ti --rm -v $(PWD):/go/src/github.com/ehazlett/element element-dev ash -c "echo ${PACKAGES} | xargs /go/bin/protobuild"
+
 build-app:
 	@echo " -> Building $(TAG)$(BUILD)"
 	@cd cmd/$(APP) && go build -v -ldflags "-w -X github.com/$(REPO)/version.GitCommit=$(COMMIT) -X github.com/$(REPO)/version.Build=$(BUILD)" .

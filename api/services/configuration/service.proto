@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package element.v1.configuration;
+
+import "github.com/ehazlett/element/api/types/service.proto";
+
+service Configuration {
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse) {}
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {}
+}
+
+message CreateServiceRequest {
+  element.v1.types.Service service = 1;
+}
+message CreateServiceResponse {}
+
+message ListServicesRequest {}
+message ListServicesResponse{
+  repeated element.v1.types.Service services = 1;
+}

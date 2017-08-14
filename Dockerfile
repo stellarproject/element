@@ -12,6 +12,8 @@ RUN go get github.com/golang/protobuf/protoc-gen-go
 RUN go get github.com/gogo/protobuf/protoc-gen-gofast
 RUN go get github.com/gogo/protobuf/proto
 RUN go get github.com/gogo/protobuf/gogoproto
+RUN go get github.com/gogo/protobuf/protoc-gen-gogo
+RUN go get github.com/gogo/protobuf/protoc-gen-gogofast
 RUN go get github.com/stevvooe/protobuild
 ENV APP element
 ENV REPO ehazlett/$APP

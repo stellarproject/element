@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s *Server) reload(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiReload(w http.ResponseWriter, r *http.Request) {
 	if err := s.proxy.Reload(); err != nil {
 		http.Error(w, fmt.Sprintf("error reloading: %s", err), http.StatusInternalServerError)
 		return

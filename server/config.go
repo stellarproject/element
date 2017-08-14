@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiGetConfig(w http.ResponseWriter, r *http.Request) {
 	cfg, err := s.proxy.Config()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting config: %s", err), http.StatusInternalServerError)
@@ -19,7 +19,7 @@ func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) getConfigRaw(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiGetConfigRaw(w http.ResponseWriter, r *http.Request) {
 	cfg, err := s.proxy.Config()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting config: %s", err), http.StatusInternalServerError)

@@ -9,10 +9,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (s *Server) addFrontend(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiAddFrontend(w http.ResponseWriter, r *http.Request) {
 	var frontend *proxy.Frontend
 	if err := json.NewDecoder(r.Body).Decode(&frontend); err != nil {
-		http.Error(w, fmt.Sprintf("invalid fronend: %s", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("invalid frontend: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -20,22 +20,18 @@ func (s *Server) addFrontend(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error adding frontend: %s", err), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
-func (s *Server) removeFrontend(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiRemoveFrontend(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	if err := s.proxy.RemoveFrontend(name); err != nil {
 		http.Error(w, fmt.Sprintf("error removing frontend: %s", err), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
-func (s *Server) updateFrontend(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiUpdateFrontend(w http.ResponseWriter, r *http.Request) {
 	var frontend *proxy.Frontend
 	if err := json.NewDecoder(r.Body).Decode(&frontend); err != nil {
 		http.Error(w, fmt.Sprintf("invalid fronend: %s", err), http.StatusBadRequest)
@@ -46,6 +42,4 @@ func (s *Server) updateFrontend(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error adding frontend: %s", err), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

@@ -1,22 +1,30 @@
 package server
 
 import (
+	"errors"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	configurationapi "github.com/ehazlett/element/api/services/configuration"
 	"github.com/ehazlett/element/config"
+	"github.com/ehazlett/element/datastore"
 	"github.com/ehazlett/element/proxy"
 	"github.com/ehazlett/element/runtime"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+)
+
+var (
+	ErrServiceNotFound = errors.New("service not found")
 )
 
 type Server struct {
 	cfg     *config.Config
 	proxy   *proxy.Proxy
 	runtime runtime.Runtime
+	store   datastore.Datastore
 }
 
 func NewServer(cfg *config.Config) (*Server, error) {
@@ -25,6 +33,11 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		return nil, err
 	}
 	r, err := loadRuntime(cfg.Runtime)
+	if err != nil {
+		return nil, err
+	}
+
+	store, err := loadDatastore(cfg.Datastore)
 	if err != nil {
 		return nil, err
 	}
@@ -42,46 +55,31 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		cfg:     cfg,
 		proxy:   p,
 		runtime: r,
+		store:   store,
 	}, nil
 }
 
 func (s *Server) Run() error {
-	r := s.router()
+	grpcServer := grpc.NewServer()
+	configurationapi.RegisterConfigurationServer(grpcServer, s)
 
-	srv := &http.Server{
-		Handler: r,
-	}
-
-	go func() {
-		// check for existing socket
-		if _, err := os.Stat(s.cfg.SocketPath); err == nil {
-			os.Remove(s.cfg.SocketPath)
-		}
-		l, err := net.Listen("unix", s.cfg.SocketPath)
-		if err != nil {
-			logrus.Errorf("unable to start element server: %s", err)
-			return
-		}
-
-		srv.Serve(l)
-	}()
-
-	cfg := &proxy.Config{
-		Frontends: map[string]*proxy.Frontend{
-			"element": &proxy.Frontend{
-				Name:  "element",
-				Hosts: []string{s.cfg.ListenAddr},
-				Backend: &proxy.Backend{
-					Path:      "/",
-					Upstreams: []string{"unix:" + s.cfg.SocketPath},
-				},
-			},
-		},
-	}
-
-	if err := s.proxy.Update(cfg); err != nil {
+	l, err := net.Listen("tcp", s.cfg.GRPCAddr)
+	if err != nil {
 		return err
 	}
+
+	//cfg := &proxy.Config{
+	//	Frontends: map[string]*proxy.Frontend{
+	//		"element": &proxy.Frontend{
+	//			Name:  "element",
+	//			Hosts: []string{s.cfg.ListenAddr},
+	//			Backend: &proxy.Backend{
+	//				Path:      "/",
+	//				Upstreams: []string{"unix:" + s.cfg.SocketPath},
+	//			},
+	//		},
+	//	},
+	//}
 
 	if err := s.proxy.Start(); err != nil {
 		return err
@@ -99,7 +97,7 @@ func (s *Server) Run() error {
 		}
 	}()
 
-	s.proxy.Wait()
+	grpcServer.Serve(l)
 
 	return nil
 }
