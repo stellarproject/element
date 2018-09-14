@@ -40,6 +40,11 @@ func NewAgent(cfg *Config) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(cfg.Peers) > 0 {
+		if _, err := ml.Join(cfg.Peers); err != nil {
+			return nil, err
+		}
+	}
 	return &Agent{
 		config:         cfg,
 		members:        ml,
