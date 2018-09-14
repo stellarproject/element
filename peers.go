@@ -2,7 +2,6 @@ package element
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -35,7 +34,7 @@ func (a *Agent) Peers() ([]*PeerAgent, error) {
 func (a *Agent) LocalNode() (*PeerAgent, error) {
 	return &PeerAgent{
 		Name:    a.config.NodeName,
-		Addr:    fmt.Sprintf("%s:%d", a.config.AgentAddr, a.config.AgentPort),
+		Addr:    a.config.Address,
 		Updated: time.Now(),
 	}, nil
 }
