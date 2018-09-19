@@ -23,10 +23,6 @@ const (
 
 // Config is the agent config
 type Config struct {
-	// NodeName is the name of the node.  Each node must have a unique name in the cluster.
-	NodeName string
-	// Address on which the agent will serve the GRPC services
-	Address string
 	// ConnectionType is the connection type the agent will use
 	ConnectionType string
 	// ClusterAddress bind address
@@ -37,15 +33,13 @@ type Config struct {
 	Peers []string
 	// Debug output for memberlist
 	Debug bool
-	// Labels for the peer
-	Labels map[string]string
 }
 
 func (a *Agent) Config() *Config {
 	return a.config
 }
 
-func (cfg *Config) memberListConfig(peerUpdateChan chan bool, nodeEventChan chan *NodeEvent) (*memberlist.Config, error) {
+func (cfg *Config) memberListConfig(a *Agent) (*memberlist.Config, error) {
 	var mc *memberlist.Config
 	switch cfg.ConnectionType {
 	case string(Local):
@@ -58,9 +52,9 @@ func (cfg *Config) memberListConfig(peerUpdateChan chan bool, nodeEventChan chan
 		return nil, ErrUnknownConnectionType
 	}
 
-	mc.Name = cfg.NodeName
-	mc.Delegate = NewAgentDelegate(cfg.NodeName, cfg.Address, cfg.Labels, peerUpdateChan, nodeEventChan)
-	mc.Events = NewEventHandler(nodeEventChan)
+	mc.Name = a.state.Self.ID
+	mc.Delegate = a
+	mc.Events = a
 
 	if !cfg.Debug {
 		mc.Logger = log.New(ioutil.Discard, "", 0)

@@ -25,28 +25,36 @@ type Agent struct {
 	nodeEventChan      chan *NodeEvent
 	registeredServices map[string]struct{}
 	memberConfig       *memberlist.Config
+	state              *State
 }
 
 // NewAgent returns a new node agent
-func NewAgent(cfg *Config) (*Agent, error) {
-	updateCh := make(chan bool)
-	nodeEventCh := make(chan *NodeEvent)
-	mc, err := cfg.memberListConfig(updateCh, nodeEventCh)
+func NewAgent(info *Peer, cfg *Config) (*Agent, error) {
+	var (
+		updateCh    = make(chan bool, 64)
+		nodeEventCh = make(chan *NodeEvent, 64)
+	)
+	a := &Agent{
+		config:         cfg,
+		peerUpdateChan: updateCh,
+		nodeEventChan:  nodeEventCh,
+		state: &State{
+			Self:  info,
+			Peers: make(map[string]*Peer),
+		},
+	}
+	mc, err := cfg.memberListConfig(a)
 	if err != nil {
 		return nil, err
 	}
-
 	ml, err := memberlist.Create(mc)
 	if err != nil {
 		return nil, err
 	}
-	return &Agent{
-		config:         cfg,
-		members:        ml,
-		peerUpdateChan: updateCh,
-		nodeEventChan:  nodeEventCh,
-		memberConfig:   mc,
-	}, nil
+	a.members = ml
+	a.memberConfig = mc
+
+	return a, nil
 }
 
 // SyncInterval returns the cluster sync interval
