@@ -19,21 +19,33 @@ const (
 // NodeEvent stores the event type and node information
 type NodeEvent struct {
 	// EventType is the type of event fired
-	EventType NodeEventType
+	Type NodeEventType
 	// Node is the internal cluster node
 	Node *memberlist.Node
 }
 
 // NotifyJoin notifies when a node joins the cluster
 func (a *Agent) NotifyJoin(n *memberlist.Node) {
+	a.send(&NodeEvent{
+		Type: NodeJoin,
+		Node: n,
+	})
 }
 
 // NotifyLeave notifies when a node leaves the cluster
 func (a *Agent) NotifyLeave(n *memberlist.Node) {
 	delete(a.state.Peers, n.Name)
 	a.peerUpdateChan <- true
+	a.send(&NodeEvent{
+		Type: NodeLeave,
+		Node: n,
+	})
 }
 
 // NotifyUpdate notifies when a node is updated in the cluster
 func (a *Agent) NotifyUpdate(n *memberlist.Node) {
+	a.send(&NodeEvent{
+		Type: NodeUpdate,
+		Node: n,
+	})
 }
