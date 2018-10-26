@@ -1,13 +1,11 @@
 package element
 
 import (
-	"os"
-
 	"github.com/sirupsen/logrus"
 )
 
 // Start handles cluster events
-func (a *Agent) Start(s chan os.Signal) error {
+func (a *Agent) Start() error {
 	go func() {
 		for range a.peerUpdateChan {
 			if err := a.members.UpdateNode(nodeUpdateTimeout); err != nil {
